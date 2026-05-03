@@ -1,5 +1,5 @@
 #  Auryx - Diseñador de Ropa Personalizada
-<img width="1920" height="1042" alt="image" src="https://github.com/user-attachments/assets/c086361d-1c27-4944-bf6a-77743932f03c" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0a10a818-ac6f-4921-a677-875598d0e4f0" />
 
 
 Auryx es una plataforma web que permite a los usuarios **diseñar su propia ropa** de forma interactiva: subir imágenes, ajustar tamaños, rotar, cambiar colores y guardar sus creaciones. El proyecto está compuesto por un **backend en Spring Boot** (Java 21) y un **frontend en React + Vite** con TailwindCSS y visualización 3D con Three.js.
