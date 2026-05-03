@@ -1,0 +1,294 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Player3DViewer from "../components/Player3DViewer";
+
+// IMPORTACIÓN DE IMÁGENES (ajusta las rutas según tu estructura)
+import playeraImg from "../assets/playera2D.png";
+import gorraImg from "../assets/gorra.webp";
+import hoodieImg from "../assets/Hoddie.png";
+import pantalonImg from "../assets/pantalon.webp";
+import panaImg from "../assets/pans.png";
+
+const categories = [
+  {
+    id: "playeras",
+    name: "Playeras",
+    imageUrl: "playeraImg",
+    description: "Diseña tus playeras únicas",
+    tag: "Popular",
+    tagColor: "bg-violet-500/20 text-violet-300",
+    model: true,
+  },
+  {
+    id: "gorras",
+    name: "Gorras",
+    imageUrl: gorraImg,
+    description: "Personaliza tus gorras",
+    tag: "Nuevo",
+    tagColor: "bg-emerald-500/20 text-emerald-300",
+    model: false,
+  },
+  {
+    id: "hoodies",
+    name: "Sudaderas",
+    imageUrl: hoodieImg,
+    description: "Crea hoodies exclusivos",
+    tag: "",
+    tagColor: "",
+    model: false,
+  },
+  {
+    id: "pantalones",
+    name: "Pantalones",
+    imageUrl: pantalonImg,
+    description: "Diseña pantalones a tu estilo",
+    tag: "",
+    tagColor: "",
+    model: false,
+  },
+  {
+    id: "pana",
+    name: "Pana",
+    imageUrl: panaImg,
+    description: "Prendas de pana personalizadas",
+    tag: "Premium",
+    tagColor: "bg-amber-500/20 text-amber-300",
+    model: false,
+  },
+];
+
+const features = [
+  { icon: "🎨", title: "Totalmente personalizable", desc: "Sube tus imágenes, ajusta colores y posición", bg: "bg-violet-100 dark:bg-violet-900/30" },
+  { icon: "🔄", title: "Vista 360°", desc: "Visualiza tus diseños en 3D con rotación automática", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
+  { icon: "💾", title: "Guarda tus diseños", desc: "Todos tus diseños se guardan en tu cuenta", bg: "bg-blue-100 dark:bg-blue-900/30" },
+  { icon: "📥", title: "Descarga en alta calidad", desc: "Exporta tus creaciones en formato PNG", bg: "bg-amber-100 dark:bg-amber-900/30" },
+];
+
+const Catalog = ({ darkMode }) => {
+  const [globalView, setGlobalView] = useState("2d");
+  const [cardViews, setCardViews] = useState({});
+
+  const toggleCardView = (id, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCardViews((prev) => ({
+      ...prev,
+      [id]: prev[id] ? (prev[id] === "2d" ? "3d" : "2d") : globalView === "2d" ? "3d" : "2d",
+    }));
+  };
+
+  const setGlobal = (view) => {
+    setGlobalView(view);
+    setCardViews({});
+  };
+
+  const getCardView = (id) => cardViews[id] || globalView;
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-violet-700 via-indigo-700 to-purple-800 dark:from-violet-900 dark:via-indigo-950 dark:to-gray-950 text-white">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="absolute -bottom-16 -right-16 w-80 h-80 rounded-full bg-indigo-400/20 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-3xl" />
+        </div>
+
+        <div className="relative container mx-auto px-4 py-14">
+          <div className="flex flex-col lg:flex-row items-center gap-10">
+            <div className="lg:w-1/2 text-center lg:text-left">
+              <span className="inline-block mb-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs font-medium tracking-widest uppercase text-violet-200 border border-white/10">
+                ✦ Vista 3D disponible
+              </span>
+              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4 tracking-tight">
+                Crea tu<br />
+                <span className="text-violet-200">estilo único</span>
+              </h1>
+              <p className="text-base md:text-lg text-white/75 mb-8 max-w-md mx-auto lg:mx-0">
+                Diseña, personaliza y guarda tus propias prendas.<br />
+                ¡Deja volar tu imaginación!
+              </p>
+              <div className="flex gap-6 justify-center lg:justify-start mb-8">
+                {[["5", "Categorías"], ["120+", "Diseños"], ["360°", "Vista 3D"]].map(([n, l]) => (
+                  <div key={l} className="text-center">
+                    <div className="text-2xl font-extrabold text-white">{n}</div>
+                    <div className="text-xs text-white/50 mt-0.5">{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:w-1/2 w-full">
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                <Player3DViewer
+                  modelPath="/models/tshirt.glb"
+                  color="#f5f0ff"
+                  autoRotate={true}
+                  showControls={true}
+                />
+              </div>
+              <p className="text-center text-xs text-white/40 mt-2">
+                Arrastra para rotar · Scroll para zoom
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CATÁLOGO ── */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              Elige tu prenda
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Selecciona una categoría para comenzar a diseñar
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-1 shadow-sm">
+            <button
+              onClick={() => setGlobal("2d")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                globalView === "2d"
+                  ? "bg-violet-600 text-white shadow"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+              }`}
+            >
+              2D
+            </button>
+            <button
+              onClick={() => setGlobal("3d")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                globalView === "3d"
+                  ? "bg-violet-600 text-white shadow"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+              }`}
+            >
+              3D ✦
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+          {categories.map((cat) => {
+            const view = getCardView(cat.id);
+            const is3d = view === "3d";
+
+            return (
+              <Link
+                key={cat.id}
+                to={`/catalog/${cat.id}`}
+                className="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${
+                  cat.id === "playeras" ? "from-violet-500 to-purple-600" :
+                  cat.id === "gorras"   ? "from-emerald-500 to-teal-500" :
+                  cat.id === "hoodies"  ? "from-blue-500 to-cyan-500" :
+                  cat.id === "pantalones" ? "from-rose-500 to-pink-500" :
+                  "from-amber-500 to-orange-500"
+                }`} />
+
+                <div className="relative h-44 bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                  {cat.tag && (
+                    <span className={`absolute top-3 left-3 z-10 text-xs font-semibold px-2 py-0.5 rounded-full ${cat.tagColor}`}>
+                      {cat.tag}
+                    </span>
+                  )}
+
+                  {/* Vista 2D: muestra la imagen PNG */}
+                  {!is3d && (
+                    <img
+                      src={cat.imageUrl}
+                      alt={cat.name}
+                      className="w-28 h-28 object-contain group-hover:scale-110 transition-transform duration-300 select-none"
+                    />
+                  )}
+
+                  {/* Vista 3D: solo playeras tiene modelo real, el resto muestra imagen con animación */}
+                  {is3d && cat.model && (
+                    <div className="w-full h-full">
+                      <Player3DViewer
+                        modelPath="/models/tshirt.glb"
+                        color="#ffffff"
+                        autoRotate={true}
+                        showControls={false}
+                      />
+                    </div>
+                  )}
+                  {is3d && !cat.model && (
+                    <img
+                      src={cat.imageUrl}
+                      alt={cat.name}
+                      className="w-28 h-28 object-contain animate-spin-slow"
+                    />
+                  )}
+
+                  <button
+                    onClick={(e) => toggleCardView(cat.id, e)}
+                    className="absolute bottom-2 right-2 z-10 bg-white/90 dark:bg-gray-900/90 text-gray-600 dark:text-gray-300 text-xs font-medium px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-violet-400 hover:text-violet-600 dark:hover:text-violet-400 transition-all shadow-sm backdrop-blur-sm"
+                  >
+                    {is3d ? "← 2D" : "3D ✦"}
+                  </button>
+                </div>
+
+                <div className="p-4">
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-3 leading-relaxed">
+                    {cat.description}
+                  </p>
+                  <span className="inline-flex items-center text-sm font-semibold text-violet-600 dark:text-violet-400 group-hover:gap-1.5 gap-1 transition-all">
+                    Comenzar
+                    <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-16 transition-colors duration-300">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-extrabold text-center text-gray-900 dark:text-white mb-2 tracking-tight">
+            ¿Por qué diseñar con Auryx?
+          </h2>
+          <p className="text-center text-sm text-gray-400 dark:text-gray-500 mb-10">
+            Todo lo que necesitas para crear prendas únicas
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {features.map((f) => (
+              <div key={f.title} className="text-center group">
+                <div className={`w-14 h-14 ${f.bg} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="text-2xl">{f.icon}</span>
+                </div>
+                <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-1">{f.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Animación personalizada para imágenes en modo 3D sin modelo */}
+      <style>{`
+        @keyframes spin-slow {
+          0% { transform: rotateY(0deg); }
+          100% { transform: rotateY(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 4s linear infinite;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default Catalog;
