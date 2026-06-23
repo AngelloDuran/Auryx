@@ -100,7 +100,7 @@ CREATE DATABASE auryx CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 3.Configura las credenciales de la base de datos y el secreto JWT en el archivo src/main/resources/application.properties:
 
 properties
-spring.datasource.url=jdbc:mysql://localhost:3306/auryx?useSSL=false&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:*****/auryx*******************************
 spring.datasource.username=TU_USUARIO
 spring.datasource.password=TU_CONTRASEÑA
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
@@ -108,15 +108,15 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-jwt.secret=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-jwt.expiration=86400000
+jwt.secret=****************************************
+jwt.expiration=*************
 
 4.Compila y ejecuta el backend (puedes usar el wrapper de Maven):
 
 bash
 ./mvnw clean compile
 ./mvnw spring-boot:run
-El backend quedará disponible en http://localhost:8080.
+El backend quedará disponible en http://localhost:*******.
 
 Frontend (React + Vite)
 1.Abre otra terminal y ve a la carpeta del frontend:
