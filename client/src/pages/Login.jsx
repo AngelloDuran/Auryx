@@ -1,76 +1,100 @@
 import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { googleLogin } from "../services/api";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       await login(formData);
-    } catch (error) {
-      console.error("Login failed:", error);
+      navigate("/catalog"); // ← redirección al catálogo
+    } catch (err) {
+      setError("Correo o contraseña incorrectos");
+      console.error("Login failed:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
-        {/* Title and subtext similar to the image */}
-        <h1 className="text-3xl font-bold mb-2 text-gray-900">
-          Inicia sesión en tu cuenta
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 px-4">
+      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
+
+        {/* Logo */}
+        <div className="flex items-center gap-2 mb-8">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-sm">
+            <span className="text-sm">✦</span>
+          </div>
+          <span className="text-lg font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Auryx<span className="text-violet-500">.</span>
+          </span>
+        </div>
+
+        <h1 className="text-2xl font-extrabold mb-1 text-gray-900 dark:text-white">
+          Inicia sesión
         </h1>
-        {/* Email and Password Form */}
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          Bienvenido de vuelta a Auryx
+        </p>
+
+        {/* Error */}
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Correo electrónico
             </label>
             <input
               type="email"
               name="email"
-              placeholder=""
               value={formData.email}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+              placeholder="tu@correo.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Contraseña
             </label>
             <input
               type="password"
               name="password"
-              placeholder=""
               value={formData.password}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+              placeholder="••••••••"
               required
             />
           </div>
 
           <div className="flex justify-between items-center text-sm">
-            <label className="flex items-center text-gray-700">
-              <input type="checkbox" className="mr-2" />
+            <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400 cursor-pointer">
+              <input type="checkbox" className="rounded border-gray-300 dark:border-gray-600 text-violet-600" />
               Recuérdame
             </label>
-            <a href="#" className="text-blue-600 hover:underline">
+            <a href="#" className="text-violet-600 dark:text-violet-400 hover:underline">
               ¿Olvidaste tu contraseña?
             </a>
           </div>
@@ -78,29 +102,47 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors duration-200 shadow-sm"
           >
-            {loading ? "Iniciando..." : "Iniciar sesión"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                Iniciando...
+              </span>
+            ) : "Iniciar sesión"}
           </button>
         </form>
-        
-        {/* Separator */}
-        <div className="my-6 flex items-center">
-          <hr className="flex-grow border-gray-300" />
-          <span className="px-4 text-gray-500 text-sm">o continuar con</span>
-          <hr className="flex-grow border-gray-300" />
+
+        {/* Separador */}
+        <div className="my-6 flex items-center gap-3">
+          <hr className="flex-grow border-gray-200 dark:border-gray-700" />
+          <span className="text-gray-400 dark:text-gray-500 text-xs">o continuar con</span>
+          <hr className="flex-grow border-gray-200 dark:border-gray-700" />
         </div>
 
-        {/* Social Login Buttons */}
-        <div className="flex space-x-4">
-          <button
-            onClick={googleLogin}
-            className="w-1/2 flex items-center justify-center px-2 py-3 border border-gray-300 rounded-md shadow-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
-          >
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="h-5 w-5 mr-2" />   
-          </button>
-          {/* Add a button for Github or other social logins if needed */}
-        </div>
+        {/* Google */}
+        <button
+          onClick={googleLogin}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium text-sm shadow-sm"
+        >
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+            alt="Google"
+            className="h-5 w-5"
+          />
+          Continuar con Google
+        </button>
+
+        {/* Registro */}
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+          ¿No tienes cuenta?{" "}
+          <Link to="/register" className="text-violet-600 dark:text-violet-400 font-semibold hover:underline">
+            Regístrate
+          </Link>
+        </p>
       </div>
     </div>
   );

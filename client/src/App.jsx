@@ -12,7 +12,7 @@ import Playeras from './pages/catalog/Playeras';
 import Gorras from './pages/catalog/Gorras';
 import Hoodies from './pages/catalog/Hoodies';
 import Pantalones from './pages/catalog/Pantalones';
-import Pana from './pages/catalog/Pana';
+import Pana from './pages/catalog/Pans';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
     <Router>
       <AuthProvider>
         <ProductProvider>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
             <Navbar />
             <Routes>
               {/* Rutas públicas */}
@@ -71,7 +71,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/catalog/pana" 
+                path="/catalog/pans" 
                 element={
                   <PrivateRoute>
                     <Pana />

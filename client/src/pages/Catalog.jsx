@@ -1,60 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Player3DViewer from "../components/Player3DViewer";
 
-// IMPORTACIÓN DE IMÁGENES (ajusta las rutas según tu estructura)
 import playeraImg from "../assets/playera2D.png";
-import gorraImg from "../assets/gorra.webp";
-import hoodieImg from "../assets/Hoddie.png";
-import pantalonImg from "../assets/pantalon.webp";
-import panaImg from "../assets/pans.png";
+import gorraImg from "../assets/tshirt.png";
+import hoodieImg from "../assets/hoddie.png";
+import pantalonImg from "../assets/pants.png";
+import pansImg from "../assets/pans.png";
 
 const categories = [
   {
-    id: "playeras",
-    name: "Playeras",
-    imageUrl: "playeraImg",
+    id: "playeras", name: "Playeras", imageUrl: playeraImg,
     description: "Diseña tus playeras únicas",
-    tag: "Popular",
-    tagColor: "bg-violet-500/20 text-violet-300",
-    model: true,
+    tag: "Popular", tagColor: "bg-violet-500/20 text-violet-300",
+    modelPath: "/models/tshirt.glb", cameraDistance: 40, scale: 1,
   },
   {
-    id: "gorras",
-    name: "Gorras",
-    imageUrl: gorraImg,
+    id: "gorras", name: "Gorras", imageUrl: gorraImg,
     description: "Personaliza tus gorras",
-    tag: "Nuevo",
-    tagColor: "bg-emerald-500/20 text-emerald-300",
-    model: false,
+    tag: "Nuevo", tagColor: "bg-emerald-500/20 text-emerald-300",
+    modelPath: "/models/cap.glb", cameraDistance: 3, scale: 3,
   },
   {
-    id: "hoodies",
-    name: "Sudaderas",
-    imageUrl: hoodieImg,
+    id: "hoodies", name: "Sudaderas", imageUrl: hoodieImg,
     description: "Crea hoodies exclusivos",
-    tag: "",
-    tagColor: "",
-    model: false,
+    tag: "", tagColor: "",
+    modelPath: "/models/hoddie.glb", cameraDistance: 3, scale: 1.2,
   },
   {
-    id: "pantalones",
-    name: "Pantalones",
-    imageUrl: pantalonImg,
+    id: "pantalones", name: "Pantalones", imageUrl: pantalonImg,
     description: "Diseña pantalones a tu estilo",
-    tag: "",
-    tagColor: "",
-    model: false,
+    tag: "", tagColor: "",
+    modelPath: "/models/pants.glb", cameraDistance: 3, scale: 1,
   },
   {
-    id: "pana",
-    name: "Pana",
-    imageUrl: panaImg,
-    description: "Prendas de pana personalizadas",
-    tag: "Premium",
-    tagColor: "bg-amber-500/20 text-amber-300",
-    model: false,
+    id: "pans", name: "Pans", imageUrl: pansImg,
+    description: "Prendas de pans personalizadas",
+    tag: "Premium", tagColor: "bg-amber-500/20 text-amber-300",
+    modelPath: "/models/pans.glb", cameraDistance: 1000, scale: 0.3,
   },
+];
+
+const heroModels = [
+  { label: "Playera",  path: "/models/tshirt.glb", color: "#f5f0ff", cameraDistance: 40,  scale: 1   },
+  { label: "Gorra",    path: "/models/cap.glb",    color: "#e0f0ff", cameraDistance: 3,   scale: 3   },
+  { label: "Sudadera", path: "/models/hoddie.glb", color: "#f0fff4", cameraDistance: 3,   scale: 1.2 },
+  { label: "Pantalón", path: "/models/pants.glb",  color: "#fff7e0", cameraDistance: 3,   scale: 1   },
+  { label: "Pans",     path: "/models/pans.glb",   color: "#ffe0f0", cameraDistance: 900, scale: 1   },
 ];
 
 const features = [
@@ -65,24 +57,26 @@ const features = [
 ];
 
 const Catalog = ({ darkMode }) => {
-  const [globalView, setGlobalView] = useState("2d");
   const [cardViews, setCardViews] = useState({});
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((i) => (i + 1) % heroModels.length);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
 
   const toggleCardView = (id, e) => {
     e.preventDefault();
     e.stopPropagation();
     setCardViews((prev) => ({
       ...prev,
-      [id]: prev[id] ? (prev[id] === "2d" ? "3d" : "2d") : globalView === "2d" ? "3d" : "2d",
+      [id]: prev[id] === "3d" ? "2d" : "3d",
     }));
   };
 
-  const setGlobal = (view) => {
-    setGlobalView(view);
-    setCardViews({});
-  };
-
-  const getCardView = (id) => cardViews[id] || globalView;
+  const activeHero = heroModels[heroIndex];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -97,6 +91,7 @@ const Catalog = ({ darkMode }) => {
 
         <div className="relative container mx-auto px-4 py-14">
           <div className="flex flex-col lg:flex-row items-center gap-10">
+
             <div className="lg:w-1/2 text-center lg:text-left">
               <span className="inline-block mb-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs font-medium tracking-widest uppercase text-violet-200 border border-white/10">
                 ✦ Vista 3D disponible
@@ -121,13 +116,38 @@ const Catalog = ({ darkMode }) => {
 
             <div className="lg:w-1/2 w-full">
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                {/*
+                  ✅ FIX HERO: Un solo Canvas siempre montado.
+                  En lugar de key={activeHero.path} (que destruye/recrea el Canvas en cada cambio),
+                  pasamos el modelPath como prop y dejamos que Player3DViewer cambie el modelo internamente.
+                  El Canvas NUNCA se destruye — solo cambia el GLB cargado.
+                */}
                 <Player3DViewer
-                  modelPath="/models/tshirt.glb"
-                  color="#f5f0ff"
+                  modelPath={activeHero.path}
+                  color={activeHero.color}
+                  cameraDistance={activeHero.cameraDistance}
+                  scale={activeHero.scale}
                   autoRotate={true}
                   showControls={true}
                 />
               </div>
+
+              <div className="flex justify-center gap-2 mt-4 flex-wrap">
+                {heroModels.map((m, i) => (
+                  <button
+                    key={m.path}
+                    onClick={() => setHeroIndex(i)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                      i === heroIndex
+                        ? "bg-white text-violet-700 border-white shadow"
+                        : "bg-white/10 text-white/70 border-white/20 hover:bg-white/20"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+
               <p className="text-center text-xs text-white/40 mt-2">
                 Arrastra para rotar · Scroll para zoom
               </p>
@@ -138,44 +158,18 @@ const Catalog = ({ darkMode }) => {
 
       {/* ── CATÁLOGO ── */}
       <section className="container mx-auto px-4 py-16">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
-          <div>
-            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              Elige tu prenda
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Selecciona una categoría para comenzar a diseñar
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-1 shadow-sm">
-            <button
-              onClick={() => setGlobal("2d")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                globalView === "2d"
-                  ? "bg-violet-600 text-white shadow"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-              }`}
-            >
-              2D
-            </button>
-            <button
-              onClick={() => setGlobal("3d")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                globalView === "3d"
-                  ? "bg-violet-600 text-white shadow"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-              }`}
-            >
-              3D ✦
-            </button>
-          </div>
+        <div className="mb-10">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            Elige tu prenda
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Selecciona una categoría · Haz click en "3D ✦" para previsualizar en 3D
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {categories.map((cat) => {
-            const view = getCardView(cat.id);
-            const is3d = view === "3d";
+            const isExplicit3d = cardViews[cat.id] === "3d";
 
             return (
               <Link
@@ -184,9 +178,9 @@ const Catalog = ({ darkMode }) => {
                 className="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${
-                  cat.id === "playeras" ? "from-violet-500 to-purple-600" :
-                  cat.id === "gorras"   ? "from-emerald-500 to-teal-500" :
-                  cat.id === "hoodies"  ? "from-blue-500 to-cyan-500" :
+                  cat.id === "playeras"   ? "from-violet-500 to-purple-600" :
+                  cat.id === "gorras"     ? "from-emerald-500 to-teal-500" :
+                  cat.id === "hoodies"    ? "from-blue-500 to-cyan-500" :
                   cat.id === "pantalones" ? "from-rose-500 to-pink-500" :
                   "from-amber-500 to-orange-500"
                 }`} />
@@ -198,39 +192,44 @@ const Catalog = ({ darkMode }) => {
                     </span>
                   )}
 
-                  {/* Vista 2D: muestra la imagen PNG */}
-                  {!is3d && (
-                    <img
-                      src={cat.imageUrl}
-                      alt={cat.name}
-                      className="w-28 h-28 object-contain group-hover:scale-110 transition-transform duration-300 select-none"
-                    />
-                  )}
+                  {/*
+                    ✅ FIX CARDS: display:none en lugar de condicional JSX.
+                    La imagen siempre está en el DOM pero oculta cuando está en 3D.
+                    El Canvas 3D siempre está en el DOM pero oculto cuando está en 2D.
+                    Esto evita destruir/recrear el Canvas al hacer toggle.
+                    IMPORTANTE: el Canvas de cards se monta solo al primer toggle (lazy),
+                    por eso no hay contextos en exceso al cargar la página.
+                  */}
+                  <img
+                    src={cat.imageUrl}
+                    alt={cat.name}
+                    style={{ display: isExplicit3d ? "none" : "block" }}
+                    className="w-28 h-28 object-contain group-hover:scale-110 transition-transform duration-300 select-none"
+                  />
 
-                  {/* Vista 3D: solo playeras tiene modelo real, el resto muestra imagen con animación */}
-                  {is3d && cat.model && (
-                    <div className="w-full h-full">
+                  {/* Solo renderiza el Player3DViewer si el usuario alguna vez activó 3D en esta card */}
+                  {(isExplicit3d || cardViews[cat.id] !== undefined) && (
+                    <div
+                      className="absolute inset-0"
+                      style={{ display: isExplicit3d ? "block" : "none" }}
+                    >
                       <Player3DViewer
-                        modelPath="/models/tshirt.glb"
+                        modelPath={cat.modelPath}
+                        cameraDistance={cat.cameraDistance}
+                        scale={cat.scale}
                         color="#ffffff"
                         autoRotate={true}
                         showControls={false}
+                        height="h-full"
                       />
                     </div>
-                  )}
-                  {is3d && !cat.model && (
-                    <img
-                      src={cat.imageUrl}
-                      alt={cat.name}
-                      className="w-28 h-28 object-contain animate-spin-slow"
-                    />
                   )}
 
                   <button
                     onClick={(e) => toggleCardView(cat.id, e)}
                     className="absolute bottom-2 right-2 z-10 bg-white/90 dark:bg-gray-900/90 text-gray-600 dark:text-gray-300 text-xs font-medium px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-violet-400 hover:text-violet-600 dark:hover:text-violet-400 transition-all shadow-sm backdrop-blur-sm"
                   >
-                    {is3d ? "← 2D" : "3D ✦"}
+                    {isExplicit3d ? "← 2D" : "3D ✦"}
                   </button>
                 </div>
 
@@ -276,17 +275,6 @@ const Catalog = ({ darkMode }) => {
           </div>
         </div>
       </section>
-
-      {/* Animación personalizada para imágenes en modo 3D sin modelo */}
-      <style>{`
-        @keyframes spin-slow {
-          0% { transform: rotateY(0deg); }
-          100% { transform: rotateY(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 4s linear infinite;
-        }
-      `}</style>
     </div>
   );
 };

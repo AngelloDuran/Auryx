@@ -23,6 +23,16 @@ const Navbar = () => {
       localStorage.setItem("auryx-theme", "light");
     }
   }, [darkMode]);
+  
+  useEffect(() => {
+  const saved = localStorage.getItem("auryx-theme");
+  const root = document.documentElement;
+  if (saved === "dark") {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark");
+  }
+}, []);
 
   // Sombra al hacer scroll
   useEffect(() => {
